@@ -27,7 +27,28 @@ export default function DashboardPage () {
       .filter(c => !['Signé','Perdu','Refusé','Clôturé'].includes(c.statut_devis))
       .reduce((a,b)=> a + Number(b.devis?.montant_ttc||0), 0)
     const cee = clients.reduce((a,b)=> a + Number(b.volume_cee_estime||0), 0)
-    return { total, sent: sent.length, sentMonth: sentMonth.length, signed: signed.length, conv, totalSent, totalSigned, pipeline, cee }
+
+    // ─── CA RÉEL — pour chaque devis SIGNÉ uniquement ───
+    // = (reste à charge client) + (prime CEE réellement versée par le mandataire)
+    // Si prime_cee_reelle non saisie → on utilise la prime estimée du devis
+    const caReel = signed.reduce((a, b) => {
+      const ttc          = Number(b.devis?.montant_ttc || 0)
+      const primeEstimee = Number(b.devis?.prime_cee   || 0)
+      const primeReelle  = b.prime_cee_reelle != null ? Number(b.prime_cee_reelle) : null
+      const reste        = Math.max(0, ttc - primeEstimee)
+      const prime        = primeReelle ?? primeEstimee
+      return a + reste + prime
+    }, 0)
+    // Total des primes CEE réellement versées (pour info séparée)
+    const primesReelles = signed.reduce((a, b) => {
+      const v = b.prime_cee_reelle != null ? Number(b.prime_cee_reelle) : Number(b.devis?.prime_cee || 0)
+      return a + v
+    }, 0)
+    // Combien de signés avec une prime réelle saisie (pour afficher le degré de confiance)
+    const reellesSaisies = signed.filter(c => c.prime_cee_reelle != null).length
+
+    return { total, sent: sent.length, sentMonth: sentMonth.length, signed: signed.length, conv,
+             totalSent, totalSigned, pipeline, cee, caReel, primesReelles, reellesSaisies }
   }, [clients])
 
   return (
@@ -50,14 +71,15 @@ export default function DashboardPage () {
 
       {/* KPIs */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <KpiCard label="Clients"       value={k.total}      icon={Users}      accent="violet" />
-        <KpiCard label="Devis envoyés (total)" value={k.sent} icon={FileText} accent="blue" sub={`${k.sentMonth} ce mois-ci`}/>
-        <KpiCard label="Devis signés"  value={k.signed}     icon={BadgeCheck} accent="green"/>
-        <KpiCard label="Taux de conversion" value={k.conv} format="pct" icon={TrendingUp} accent="gold"/>
-        <KpiCard label="Montant devis envoyés"  value={k.totalSent}   format="eur" icon={Banknote} accent="blue"/>
-        <KpiCard label="Montant devis signés"   value={k.totalSigned} format="eur" icon={Coins}    accent="green"/>
-        <KpiCard label="CA prévisionnel pipeline" value={k.pipeline}  format="eur" icon={Briefcase} accent="violet"/>
-        <KpiCard label="Volume CEE estimé"       value={k.cee}        format="num" suffix=" kWh" icon={Zap} accent="gold"/>
+        <KpiCard label="Clients"       value={k.total}      icon={Users}      accent="copper" />
+        <KpiCard label="Devis envoyés (total)" value={k.sent} icon={FileText} accent="copper" sub={`${k.sentMonth} ce mois-ci`}/>
+        <KpiCard label="Devis signés"  value={k.signed}     icon={BadgeCheck} accent="forest"/>
+        <KpiCard label="Taux de conversion" value={k.conv} format="pct" icon={TrendingUp} accent="copper"/>
+        <KpiCard label="Montant devis signés (TTC)" value={k.totalSigned} format="eur" icon={Coins} accent="forest"/>
+        <KpiCard label="CA RÉEL encaissé"  value={k.caReel}  format="eur" icon={Banknote} accent="copper"
+          sub={k.signed > 0 ? `${k.reellesSaisies}/${k.signed} primes réelles saisies` : 'Aucun signé encore'}/>
+        <KpiCard label="CA prévisionnel pipeline" value={k.pipeline}  format="eur" icon={Briefcase} accent="glacier"/>
+        <KpiCard label="Volume CEE estimé"       value={k.cee}        format="num" suffix=" kWh" icon={Zap} accent="copper"/>
       </div>
 
       {/* Charts */}
