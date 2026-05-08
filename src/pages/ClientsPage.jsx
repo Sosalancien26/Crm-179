@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Plus, Search, Filter, Download, Sparkles } from 'lucide-react'
 import Button from '../components/ui/Button'
@@ -18,6 +18,7 @@ export default function ClientsPage () {
   const { clients, loading } = useClients()
   const { byCat } = useParametres()
   const [params, setParams] = useSearchParams()
+  const nav = useNavigate()
 
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [editing, setEditing] = useState(null) // null = new
@@ -74,14 +75,11 @@ export default function ClientsPage () {
 
   // Ouverture par ?id= ou ?new=1
   useEffect(() => {
-    const id = params.get('id')
+    const idFromQuery = params.get('id')
     const isNew = params.get('new')
     if (isNew) { setEditing(null); setDrawerOpen(true) }
-    else if (id) {
-      const c = clients.find(x => x.id === id)
-      if (c) { setEditing(c); setDrawerOpen(true) }
-    }
-  }, [params, clients])
+    else if (idFromQuery) { nav('/clients/' + idFromQuery, { replace: true }) }
+  }, [params, clients, nav])
 
   const closeDrawer = () => {
     setDrawerOpen(false); setEditing(null)
@@ -172,7 +170,7 @@ export default function ClientsPage () {
         ? <div className="space-y-2">
             {Array.from({length:8}).map((_,i)=> <Skeleton key={i} className="h-14 w-full"/>)}
           </div>
-        : <ClientList clients={visibles} onOpen={(c)=>{ setEditing(c); setDrawerOpen(true) }} paramColors={paramColors}/>
+        : <ClientList clients={visibles} onOpen={(c)=> nav("/clients/" + c.id)} paramColors={paramColors}/>
       }
       {visibles.length < filtered.length && (
         <div className="text-center text-xs text-ink-300 mt-3">

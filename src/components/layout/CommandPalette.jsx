@@ -29,7 +29,7 @@ export default function CommandPalette ({ open, onClose, clients=[], onCreateCli
       label: `${c.client_id} — ${c.raison_sociale || '(sans nom)'}`,
       sub:   c.adresse_chantier?.ville || c.adresse_facturation?.ville,
       icon:  Users, kind:'Client',
-      run:   () => { onClose(); nav('/clients?id=' + c.id) }
+      run:   () => { onClose(); nav('/clients/' + c.id) }
     }))
     if (!q) return list
     const t = q.toLowerCase()
