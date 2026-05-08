@@ -5,7 +5,6 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
-# Permet au workflow de pousser sur la branche `production`
 permissions:
   contents: write
 
@@ -33,7 +32,7 @@ jobs:
       - name: 🏗️ Build production bundle
         run: npm run build
 
-      - name: 🚀 Push dist/ to `production` branch
+      - name: 🚀 Push dist/ to production branch
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -45,4 +44,12 @@ jobs:
           commit_message: "deploy: ${{ github.event.head_commit.message }}"
 
       - name: 🔔 Notify Hostinger to pull
-        if: 
+        env:
+          HOOK_URL: ${{ secrets.HOSTINGER_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$HOOK_URL" ]; then
+            echo "HOSTINGER_DEPLOY_HOOK secret not set, skipping webhook"
+            exit 0
+          fi
+          curl -X POST -fsSL "$HOOK_URL"
+          echo "Hostinger deploy hook triggered"
