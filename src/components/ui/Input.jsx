@@ -10,12 +10,12 @@ const Input = forwardRef(function Input ({
       <div className="relative">
         {Icon && <Icon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-ink-300" />}
         <input ref={ref}
-          className={cls('input-base', Icon && 'pl-9', error && 'border-rose-500/60', className)}
+          className={cls('input-base', Icon && 'pl-9', error && 'border-brick-400', className)}
           {...props} />
       </div>
       {error
-        ? <span className="text-xs text-rose-400">{error}</span>
-        : hint && <span className="text-xs text-ink-300/80">{hint}</span>}
+        ? <span className="text-xs text-brick-400">{error}</span>
+        : hint && <span className="text-xs text-soft">{hint}</span>}
     </div>
   )
 })
@@ -28,9 +28,9 @@ export const Textarea = forwardRef(function Textarea ({
     <div className={cls('flex flex-col gap-1.5', wrapperClass)}>
       {label && <label className="label">{label}</label>}
       <textarea ref={ref} rows={rows}
-        className={cls('input-base resize-none', error && 'border-rose-500/60', className)}
+        className={cls('input-base resize-none leading-relaxed', error && 'border-brick-400', className)}
         {...props} />
-      {error && <span className="text-xs text-rose-400">{error}</span>}
+      {error && <span className="text-xs text-brick-400">{error}</span>}
     </div>
   )
 })

@@ -2,112 +2,146 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ========== Base ========== */
+/* ========== Base — mode papier ========== */
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 html, body, #root { height: 100%; }
 body {
   font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  background-color: #0A0A0F;
+  background-color: #F7F4EE;
   background-image:
-    radial-gradient(ellipse at top, rgba(124,58,237,.10), transparent 60%),
-    radial-gradient(ellipse at bottom right, rgba(59,130,246,.08), transparent 55%),
-    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .04 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    radial-gradient(ellipse at 10% 0%, rgba(184,101,29,.05), transparent 50%),
+    radial-gradient(ellipse at 90% 100%, rgba(52,94,114,.04), transparent 60%);
   background-attachment: fixed;
+  color: #1F1C18;
+  font-feature-settings: 'ss01', 'cv11';  /* alt glyphs Inter */
+  -webkit-font-smoothing: antialiased;
 }
-html.light body {
-  background-color: #F5F5F8;
+
+/* Texture papier subtile */
+body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0.45 0 0 0 0 0.32 0 0 0 0 0.18 0 0 0 .035 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  opacity: .9;
+  mix-blend-mode: multiply;
+}
+
+/* Mode sombre alternatif (toggle) */
+html.dark body {
+  background-color: #15130F;
   background-image:
-    radial-gradient(ellipse at top, rgba(124,58,237,.08), transparent 60%),
-    radial-gradient(ellipse at bottom right, rgba(59,130,246,.06), transparent 55%);
-  color: #0A0A0F;
+    radial-gradient(ellipse at top, rgba(184,101,29,.08), transparent 60%);
+  color: #E8E6E3;
 }
+html.dark body::before { opacity: .35; }
 
-/* ========== Scrollbars ========== */
-*::-webkit-scrollbar { width: 10px; height: 10px; }
+/* Scrollbars discrètes */
+*::-webkit-scrollbar { width: 9px; height: 9px; }
 *::-webkit-scrollbar-track { background: transparent; }
-*::-webkit-scrollbar-thumb { background: rgba(255,255,255,.06); border-radius: 8px; border: 2px solid transparent; background-clip: padding-box; }
-*::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.12); border: 2px solid transparent; background-clip: padding-box; }
+*::-webkit-scrollbar-thumb {
+  background: rgba(60,50,30,.18);
+  border-radius: 8px; border: 2px solid transparent; background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover { background: rgba(60,50,30,.28); border: 2px solid transparent; background-clip: padding-box; }
+html.dark *::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); }
 
-/* ========== Reusable utility classes ========== */
+/* ========== Sélection ========== */
+::selection { background: #B8651D; color: #FBFAF6; }
+
+/* ========== Composants utilitaires ========== */
 @layer components {
-  .glass {
-    @apply bg-ink-800/60 backdrop-blur-xl border border-white/[.06];
+  .surface {
+    @apply bg-paper-50 border border-paper-300 shadow-paper;
   }
-  .glass-strong {
-    @apply bg-ink-800/85 backdrop-blur-2xl border border-white/[.08];
+  .surface-flat {
+    @apply bg-paper-50 border border-paper-300;
   }
   .card {
-    @apply rounded-2xl glass shadow-card;
+    @apply rounded-xl surface;
   }
-  .gradient-border {
-    position: relative;
-    background-clip: padding-box;
+  .editorial-rule {
+    background: linear-gradient(90deg, #C9BFA8 0%, #C9BFA8 60%, transparent 100%);
+    height: 1px;
   }
-  .gradient-border::before {
-    content:'';
-    position:absolute; inset:0;
-    border-radius: inherit; padding:1px;
-    background: linear-gradient(135deg, rgba(124,58,237,.55), rgba(59,130,246,.4) 50%, rgba(212,175,55,.35));
-    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-    -webkit-mask-composite: xor; mask-composite: exclude;
-    pointer-events: none;
+  .accent-rule {
+    height: 2px; width: 48px;
+    background: #B8651D;
+    border-radius: 2px;
   }
-  .text-gradient {
-    background: linear-gradient(135deg, #C4B5FD 0%, #93C5FD 50%, #FCD34D 100%);
-    -webkit-background-clip: text; background-clip: text; color: transparent;
-  }
-  .focus-ring {
-    @apply outline-none focus-visible:ring-2 focus-visible:ring-brand-violet/60 focus-visible:ring-offset-2 focus-visible:ring-offset-ink-900;
+  .text-accent { color: #B8651D; }
+  .text-deep   { color: #1F1C18; }
+  .text-mute   { color: #5C564B; }
+  .text-soft   { color: #7A7468; }
+  .label {
+    @apply text-[10px] uppercase font-medium tracking-editorial text-ink-300;
   }
   .input-base {
-    @apply w-full bg-ink-700/50 border border-white/[.07] rounded-xl px-3.5 py-2.5
-           text-sm text-ink-100 placeholder:text-ink-300/60
-           transition-colors focus:border-brand-violet/60 focus:bg-ink-700/70 focus-ring;
+    @apply w-full bg-paper-50 border border-paper-300 rounded-lg px-3.5 py-2.5
+           text-sm text-ink-700 placeholder:text-ink-200
+           transition-all focus:border-copper-400 focus:bg-white focus:shadow-ring focus:outline-none;
   }
-  .label {
-    @apply text-xs font-medium uppercase tracking-wider text-ink-300;
+  .focus-ring {
+    @apply outline-none focus-visible:ring-2 focus-visible:ring-copper-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-paper-100;
   }
   .row-hover {
-    @apply transition-colors hover:bg-white/[.03];
+    @apply transition-colors hover:bg-paper-100/70;
+  }
+  .num {
+    @apply font-mono tabular-nums tracking-tight;
+  }
+  .display {
+    @apply font-display tracking-tight;
+    font-feature-settings: 'ss01', 'cv11', 'liga';
+  }
+  /* Caps éditoriales (titres tags) */
+  .eyebrow {
+    @apply text-[11px] uppercase tracking-editorial text-copper-400 font-medium;
+  }
+  /* Ligature éditoriale entre éléments */
+  .divider {
+    @apply h-px bg-paper-300/60;
   }
 }
 
-/* ========== Light mode overrides ========== */
-html.light .glass        { @apply bg-white/85 border-black/5; }
-html.light .glass-strong { @apply bg-white/95 border-black/5; }
-html.light .input-base   { @apply bg-white border-black/10 text-ink-900 placeholder:text-ink-400; }
-html.light .label        { @apply text-ink-500; }
-html.light .text-gradient {
-  background: linear-gradient(135deg, #7C3AED 0%, #3B82F6 50%, #D4AF37 100%);
-  -webkit-background-clip: text; background-clip: text; color: transparent;
-}
-html.light body          { color: #0A0A0F; }
-html.light *::-webkit-scrollbar-thumb { background: rgba(0,0,0,.12); }
+/* ========== Light/dark sur primitives ========== */
+html.dark .surface       { @apply bg-ink-700/60 border-ink-600 shadow-soft; }
+html.dark .surface-flat  { @apply bg-ink-700/40 border-ink-600; }
+html.dark .input-base    { @apply bg-ink-700/40 border-ink-600 text-ink-50 placeholder:text-ink-300; }
+html.dark .text-deep     { color: #E8E6E3; }
+html.dark .text-mute     { color: #B5B0A8; }
+html.dark .row-hover     { @apply hover:bg-white/[.04]; }
+html.dark .editorial-rule{ background: linear-gradient(90deg, rgba(255,255,255,.15), transparent); }
 
-/* ========== Leaflet sombre ========== */
-.leaflet-container { background: #0A0A0F !important; }
+/* ========== Leaflet en mode clair éditorial ========== */
+.leaflet-container { background: #EAE3D2 !important; }
 .leaflet-popup-content-wrapper, .leaflet-popup-tip {
-  background: rgba(20,20,28,.95); color:#E8E8F0; border:1px solid rgba(255,255,255,.08);
-  box-shadow: 0 20px 50px -10px rgba(0,0,0,.6);
+  background: #FBFAF6;
+  color: #1F1C18;
+  border: 1px solid rgba(60,50,30,.12);
+  box-shadow: 0 12px 28px -10px rgba(60,50,30,.18);
+  font-family: 'Inter', sans-serif;
 }
 .leaflet-popup-content { margin: 12px 14px; }
-.leaflet-control-attribution { background: rgba(0,0,0,.4) !important; color:#A0A0B5 !important; }
-.leaflet-control-attribution a { color:#C4B5FD !important; }
-html.light .leaflet-container { background: #EDEDF2 !important; }
-html.light .leaflet-popup-content-wrapper, html.light .leaflet-popup-tip {
-  background:#fff; color:#0A0A0F; border:1px solid rgba(0,0,0,.08);
+.leaflet-control-attribution {
+  background: rgba(255,255,255,.85) !important;
+  color: #5C564B !important;
+}
+.leaflet-control-attribution a { color: #B8651D !important; }
+html.dark .leaflet-container { background: #15130F !important; }
+html.dark .leaflet-popup-content-wrapper, html.dark .leaflet-popup-tip {
+  background: #1F1C18; color: #E8E6E3; border-color: rgba(255,255,255,.08);
 }
 
-/* ========== Marker pulse ========== */
+/* Marker pulse — chaleur cuivre */
 .marker-pulse {
-  width: 14px; height: 14px; border-radius: 9999px;
-  box-shadow: 0 0 0 0 rgba(124,58,237,.8);
+  width: 14px; height: 14px; border-radius: 9999px; background: #B8651D;
+  box-shadow: 0 0 0 0 rgba(184,101,29,.6);
   animation: pulse 2s infinite;
 }
 @keyframes pulse {
-  0%   { box-shadow: 0 0 0 0 rgba(124,58,237,.8); }
-  70%  { box-shadow: 0 0 0 14px rgba(124,58,237,0); }
-  100% { box-shadow: 0 0 0 0 rgba(124,58,237,0); }
+  0%   { box-shadow: 0 0 0 0 rgba(184,101,29,.6); }
+  70%  { box-shadow: 0 0 0 14px rgba(184,101,29,0); }
+  100% { box-shadow: 0 0 0 0 rgba(184,101,29,0); }
 }

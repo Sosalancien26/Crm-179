@@ -7,14 +7,14 @@ export default function Badge ({ children, color, className, size='sm', dot=fals
     md: 'text-sm px-2.5 py-1'
   }[size]
   const style = color ? {
-    backgroundColor: hexToRgba(color, .14),
-    color,
+    backgroundColor: hexToRgba(color, .12),
+    color: color,
     boxShadow: `inset 0 0 0 1px ${hexToRgba(color, .35)}`
   } : undefined
   return (
     <span style={style}
       className={cls('inline-flex items-center gap-1.5 rounded-full font-medium whitespace-nowrap',
-        !color && 'bg-white/10 text-ink-100', sizes, className)}>
+        !color && 'bg-paper-200 text-ink-600 ring-1 ring-paper-300', sizes, className)}>
       {dot && <span className="w-1.5 h-1.5 rounded-full" style={{ background: color || 'currentColor' }} />}
       {children}
     </span>

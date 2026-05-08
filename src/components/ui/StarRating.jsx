@@ -11,7 +11,7 @@ export default function StarRating ({ value=0, onChange, readOnly=false, size=18
             onClick={() => !readOnly && onChange?.(n === value ? 0 : n)}
             className={cls('p-0.5 transition-transform', !readOnly && 'hover:scale-110 cursor-pointer')}>
             <Star size={size}
-              className={cls(filled ? 'fill-amber-400 text-amber-400' : 'text-ink-500')} />
+              className={cls(filled ? 'fill-copper-400 text-copper-400' : 'text-paper-400')} />
           </button>
         )
       })}

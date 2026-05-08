@@ -17,7 +17,7 @@ export default function ClientList ({ clients, onOpen, paramColors }) {
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="text-[11px] uppercase tracking-wider text-ink-300 bg-white/[.02]">
+            <tr className="text-[11px] uppercase tracking-wider text-ink-300 bg-paper-100/60">
               <th className="text-left px-4 py-3">ID</th>
               <th className="text-left px-4 py-3">Client</th>
               <th className="text-left px-4 py-3">Type</th>
@@ -37,7 +37,7 @@ export default function ClientList ({ clients, onOpen, paramColors }) {
                 <motion.tr key={c.id}
                   initial={{ opacity:0, y:4 }} animate={{ opacity:1, y:0 }}
                   transition={{ delay: i*0.015, duration: .25 }}
-                  className="row-hover border-t border-white/[.04]">
+                  className="row-hover border-t border-paper-200">
                   <td className="px-4 py-3 font-mono text-xs text-ink-300">{c.client_id}</td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-2">

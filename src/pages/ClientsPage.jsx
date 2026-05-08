@@ -130,7 +130,7 @@ export default function ClientsPage () {
       <div className="flex flex-wrap items-end justify-between gap-3 mb-4">
         <div>
           <div className="text-[11px] uppercase tracking-[.18em] text-ink-300">Annuaire</div>
-          <h1 className="font-display text-3xl md:text-4xl text-gradient">Clients</h1>
+          <h1 className="font-display text-4xl md:text-5xl text-deep tracking-tight">Clients</h1>
           <p className="text-sm text-ink-300 mt-1">{filtered.length} résultats {q && `pour « ${q} »`}</p>
         </div>
         <div className="flex items-center gap-2">

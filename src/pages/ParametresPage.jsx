@@ -47,7 +47,7 @@ export default function ParametresPage () {
     <div className="p-4 md:p-6 lg:p-8 max-w-[1400px] mx-auto">
       <div className="mb-4">
         <div className="text-[11px] uppercase tracking-[.18em] text-ink-300">Configuration</div>
-        <h1 className="font-display text-3xl md:text-4xl text-gradient">Paramètres</h1>
+        <h1 className="font-display text-4xl md:text-5xl text-deep tracking-tight">Paramètres</h1>
         <p className="text-sm text-ink-300 mt-1">Tout ce qui personnalise le CRM est éditable ici, et synchronisé avec Supabase.</p>
       </div>
 

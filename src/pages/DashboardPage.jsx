@@ -36,7 +36,7 @@ export default function DashboardPage () {
       <div className="flex flex-wrap items-end justify-between gap-3 mb-6">
         <div>
           <div className="text-[11px] uppercase tracking-[.18em] text-ink-300">Vue d'ensemble</div>
-          <h1 className="font-display text-3xl md:text-4xl text-gradient">Dashboard</h1>
+          <h1 className="font-display text-4xl md:text-5xl text-deep tracking-tight">Dashboard</h1>
           <p className="text-sm text-ink-300 mt-1">Pilotage de l'opération CEE BAR-TH-179 — PAC collective air/eau.</p>
         </div>
         <Card className="!p-0 flex items-center gap-4 px-4 py-2.5">
