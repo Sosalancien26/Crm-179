@@ -32,13 +32,16 @@ jobs:
       - name: 🏗️ Build production bundle
         run: npm run build
 
-      - name: 🚀 Push dist/ to production branch
+      # Push linéaire (force_orphan: false) → Hostinger peut faire `git pull`
+      # sans diverger. La branche grossit légèrement mais reste linéaire.
+      - name: 🚀 Push dist/ to production branch (linear history)
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
           publish_branch: production
-          force_orphan: true
+          force_orphan: false
+          keep_files: false
           user_name: 'github-actions[bot]'
           user_email: 'github-actions[bot]@users.noreply.github.com'
           commit_message: "deploy: ${{ github.event.head_commit.message }}"
@@ -49,15 +52,13 @@ jobs:
         continue-on-error: true
         run: |
           if [ -z "$HOOK_URL" ]; then
-            echo "ℹ️  No HOSTINGER_DEPLOY_HOOK secret — Hostinger will auto-pull from production branch on its own polling cycle."
+            echo "ℹ️  No HOSTINGER_DEPLOY_HOOK secret — Hostinger pulls automatically."
             exit 0
           fi
-          # Hostinger expects a JSON-ish payload — try several formats, log all responses
           echo "→ Calling Hostinger deploy hook…"
           for ATTEMPT in 1 2 3; do
             HTTP=$(curl -s -o /tmp/resp -w "%{http_code}" \
-                    -X POST \
-                    -H "Content-Type: application/json" \
+                    -X POST -H "Content-Type: application/json" \
                     -H "User-Agent: GitHub-Actions-CRM179" \
                     --data '{"ref":"refs/heads/production","branch":"production"}' \
                     "$HOOK_URL" || echo "000")
@@ -69,5 +70,4 @@ jobs:
             fi
             sleep 2
           done
-          echo "⚠️  Webhook didn't return 2xx, but Hostinger should still auto-pull from production within a few min."
-          echo "   The site will be up regardless — the dist/ is committed to the production branch."
+          echo "⚠️ Webhook didn't return 2xx, but Hostinger should still pull on its own."
