@@ -24,10 +24,10 @@ export default function MiniMapChantier ({ adresse, lat, lng }) {
     <div className="rounded-xl overflow-hidden border border-white/[.06] h-56">
       <MapContainer center={pos} zoom={14} scrollWheelZoom={false} className="h-full">
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png"
           attribution='&copy; OSM &copy; CartoDB' />
         <CircleMarker center={pos} radius={11}
-          pathOptions={{ color:'#7C3AED', weight:2, fillColor:'#7C3AED', fillOpacity:.6 }}>
+          pathOptions={{ color:'#C5A572', weight:2, fillColor:'#C5A572', fillOpacity:.6 }}>
           <Tooltip permanent direction="top" offset={[0,-4]}>
             <span className="text-[11px]">📍 Chantier</span>
           </Tooltip>

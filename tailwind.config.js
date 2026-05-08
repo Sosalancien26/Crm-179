@@ -8,9 +8,9 @@ export default {
         // === Backgrounds Gris Dior — taupe champagne ===
         paper: {
           50:  '#FFFFFF',  // surfaces (cards) — blanc pur couture
-          100: '#F5F1EA',  // fond global — champagne ivoire chaud
-          200: '#EBE5D8',  // hover/séparation taupe pâle
-          300: '#D6CCBB',  // bordures Gris Montaigne
+          100: '#EEE8DA',  // fond global — champagne ivoire chaud
+          200: '#E2DAC6',  // hover/séparation taupe pâle
+          300: '#CCC1AC',  // bordures Gris Montaigne
           400: '#B5A893'   // séparateurs profonds taupe
         },
         // === Textes — charbon couture progressif ===
@@ -61,12 +61,13 @@ export default {
         sm:'2px', md:'4px', lg:'6px', xl:'8px', '2xl':'10px'
       },
       boxShadow: {
-        // Couture : presque invisible, juste un voile
-        paper: '0 1px 0 0 rgba(28,27,25,.04), 0 0 0 1px rgba(28,27,25,.04)',
-        page:  '0 4px 16px -8px rgba(28,27,25,.08), 0 0 0 1px rgba(28,27,25,.04)',
-        sharp: '0 0 0 1px rgba(28,27,25,.06)',
-        ring:  '0 0 0 3px rgba(197,165,114,.20)',
-        soft:  '0 12px 32px -16px rgba(28,27,25,.10)'
+        // Couture : ombres présentes mais douces, pour faire ressortir
+        // les surfaces blanches sur le fond taupe.
+        paper: '0 1px 2px 0 rgba(28,27,25,.05), 0 0 0 1px rgba(28,27,25,.06)',
+        page:  '0 8px 24px -10px rgba(28,27,25,.12), 0 0 0 1px rgba(28,27,25,.06)',
+        sharp: '0 0 0 1px rgba(28,27,25,.08)',
+        ring:  '0 0 0 3px rgba(197,165,114,.25)',
+        soft:  '0 16px 40px -20px rgba(28,27,25,.15)'
       },
       backgroundImage: {
         'gradient-warm': 'linear-gradient(135deg,#C5A572 0%,#A78652 100%)',

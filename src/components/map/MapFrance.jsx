@@ -47,7 +47,7 @@ export default function MapFrance ({ clients, byCat, onOpenClient }) {
       if (filters.statut && c.statut_client !== filters.statut) return null
       if (filters.type   && c.type_client   !== filters.type)   return null
       if (filters.cdpx3  && !c.coup_de_pouce_x3) return null
-      const color = byCat('statut_client').find(s => s.valeur === c.statut_client)?.couleur || '#7C3AED'
+      const color = byCat('statut_client').find(s => s.valeur === c.statut_client)?.couleur || '#C5A572'
       return { id: c.id, lat:Number(lat), lng:Number(lng), color, c }
     }).filter(Boolean)
   }, [clients, filters, byCat, enriched])
@@ -61,13 +61,13 @@ export default function MapFrance ({ clients, byCat, onOpenClient }) {
     <div className="relative h-[calc(100vh-4rem)]">
       <MapContainer center={FRANCE_CENTER} zoom={6} className="absolute inset-0">
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png"
           attribution='&copy; OSM &copy; CartoDB' />
 
         {/* Heatmap visuelle simulée par cercles flous additionnés */}
         {heatmap && points.map(p => (
           <CircleMarker key={'h-'+p.id} center={[p.lat, p.lng]} radius={28}
-            pathOptions={{ stroke:false, fillColor:'#7C3AED', fillOpacity:.10 }}/>
+            pathOptions={{ stroke:false, fillColor:'#C5A572', fillOpacity:.10 }}/>
         ))}
 
         {points.map(p => (

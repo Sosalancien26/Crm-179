@@ -28,11 +28,11 @@ export default function MiniMapDensity ({ clients=[] }) {
       <MapContainer center={[46.6, 2.5]} zoom={5} scrollWheelZoom={false} dragging={false}
         zoomControl={false} doubleClickZoom={false} className="h-[260px] rounded-b-2xl">
         <TileLayer
-          url="https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png"
+          url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager_nolabels/{z}/{x}/{y}{r}.png"
           attribution='&copy; OSM &copy; CartoDB' />
         {data.map(d => (
           <CircleMarker key={d.dept} center={[d.lat, d.lng]} radius={d.r}
-            pathOptions={{ color:'#7C3AED', weight:1, fillColor:'#7C3AED', fillOpacity: .5 }}>
+            pathOptions={{ color:'#C5A572', weight:1, fillColor:'#C5A572', fillOpacity: .5 }}>
           </CircleMarker>
         ))}
       </MapContainer>
