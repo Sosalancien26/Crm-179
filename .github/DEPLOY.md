@@ -1,65 +1,98 @@
-# Déploiement automatique vers Hostinger
+# Déploiement automatique vers Hostinger (via Git Auto-Deploy)
 
-À chaque `git push` sur `main`, le workflow `.github/workflows/deploy.yml`
-build le projet et envoie le contenu de `dist/` sur ton hébergement
-Hostinger via FTP.
+## Comment ça marche
+
+```
+  Tu push sur main
+        ↓
+  GitHub Actions :
+    1. npm ci
+    2. npm run build  →  dist/
+    3. push dist/  →  branche `production`
+    4. curl webhook Hostinger
+        ↓
+  Hostinger fait `git pull` de la branche `production`  →  /public_html/
+        ↓
+  Site à jour 🎉
+```
+
+Tu n'as JAMAIS besoin de :
+- Build localement
+- Uploader des fichiers via FTP
+- Toucher au gestionnaire de fichiers Hostinger
+
+Juste `git push`, et tout suit.
 
 ## ⚙️ Configuration unique (à faire 1 seule fois)
 
-Va dans ton repo GitHub :
-**Settings → Secrets and variables → Actions → New repository secret**
+### 1️⃣ Côté Hostinger — connecter le repo GitHub
 
-Et ajoute ces 5 secrets :
+1. Va sur [hpanel.hostinger.com](https://hpanel.hostinger.com)
+2. Sélectionne ton hébergement → **Avancé → GitHub**
+3. Clique **Connecter** (autorise Hostinger à voir tes repos GitHub)
+4. **Créer un déploiement** :
+   - **Référentiel** : `Sosalancien26/Crm-179`
+   - **Branche** : `production` ⚠️ (et pas `main` — c'est sur `production`
+     que les fichiers buildés vont arriver)
+   - **Répertoire d'installation** : `public_html` (ou `public_html/crm` si
+     tu veux un sous-dossier)
+5. Récupère l'**URL de webhook** affichée par Hostinger (genre
+   `https://webhooks.hostinger.com/deploy/xxxxxx`) → on en aura besoin
+   à l'étape 2.
 
-| Nom du secret              | Valeur                                                      | Où la trouver |
-|----------------------------|-------------------------------------------------------------|---------------|
-| `FTP_SERVER`               | `ftp.tondomaine.com` ou l'IP du serveur                     | hPanel → Comptes FTP → ton compte |
-| `FTP_USERNAME`             | `u123456789` ou ton login FTP                                | hPanel → Comptes FTP |
-| `FTP_PASSWORD`             | mot de passe FTP                                             | hPanel → Comptes FTP (Modifier mdp) |
-| `FTP_SERVER_DIR`           | `/public_html/` (ou `/public_html/crm/` si sous-dossier)    | dépend d'où tu veux héberger |
-| `VITE_SUPABASE_URL`        | `https://yxfanlgklvpdpsrzcoqy.supabase.co`                  | déjà connu                      |
-| `VITE_SUPABASE_ANON_KEY`   | la clé anon (cf. .env.local)                                | Supabase → Settings → API       |
+### 2️⃣ Côté GitHub — ajouter les secrets
 
-### Trouver les infos FTP Hostinger
+Va sur ton repo : **Settings → Secrets and variables → Actions →
+New repository secret**.
 
-1. Connecte-toi à [hpanel.hostinger.com](https://hpanel.hostinger.com)
-2. Sélectionne ton hébergement → **Avancé → Comptes FTP**
-3. Tu verras :
-   - **Hôte FTP** → c'est `FTP_SERVER` (souvent `ftp.tondomaine.com` ou
-     `145.14.158.X`)
-   - **Nom d'utilisateur FTP** → c'est `FTP_USERNAME`
-   - **Mot de passe** → si tu ne le connais pas, clique **Changer le mot
-     de passe** et note-le. C'est `FTP_PASSWORD`.
-4. **Hôte du serveur** : note bien que sur Hostinger l'hôte FTP est souvent
-   sous la forme `ftp.tondomaine.com`. Vérifie aussi l'option **Port** :
-   par défaut `21` (FTP). Le workflow gère FTPS automatiquement.
+Ajoute ces **3 secrets** :
 
-## ✅ Vérification
+| Nom | Valeur |
+|---|---|
+| `HOSTINGER_DEPLOY_HOOK` | l'URL webhook Hostinger récupérée à l'étape 1 |
+| `VITE_SUPABASE_URL` | `https://yxfanlgklvpdpsrzcoqy.supabase.co` |
+| `VITE_SUPABASE_ANON_KEY` | la clé anon (cf. ton `.env.local`) |
 
-Après avoir ajouté les secrets :
+⚠️ **Le webhook Hostinger doit rester secret** — n'importe qui avec cette
+URL peut redéclencher un deploy. Ne jamais le mettre dans du code,
+toujours dans GitHub Secrets.
 
-```bash
-git commit --allow-empty -m "trigger: redeploy"
+## ✅ Premier test
+
+```powershell
+cd C:\Users\sacha\Documents\GitHub\Crm-179
+git commit --allow-empty -m "trigger: first auto-deploy"
 git push origin main
 ```
 
-Puis va dans **GitHub → Actions → Build & Deploy to Hostinger**.
-Tu vois le job tourner en live (1-3 min). Quand c'est vert ✅, le site
-est à jour.
+Va dans **GitHub → Actions** : tu verras le workflow tourner (1-3 min).
+Étapes affichées :
+1. ✅ Checkout
+2. ✅ Setup Node
+3. ✅ Install dependencies
+4. ✅ Build
+5. ✅ Push to `production` branch
+6. ✅ Notify Hostinger
+
+Quand tout est vert, va sur ton domaine — le CRM est en ligne.
 
 ## 🚨 Erreurs courantes
 
-- **`530 Login authentication failed`** → mauvais `FTP_USERNAME` ou
-  `FTP_PASSWORD`. Régénère le mot de passe FTP dans hPanel.
-- **`ECONNREFUSED`** → mauvais `FTP_SERVER`. Vérifie l'hôte FTP dans
-  hPanel (souvent `ftp.tondomaine.com`).
-- **`550 Permission denied`** → `FTP_SERVER_DIR` pointe vers un dossier
-  où ton compte FTP n'a pas les droits. Mets `/public_html/`.
-- **Site blanche** : ouvre la console Chrome (F12) — souvent c'est une
-  variable d'env Supabase manquante. Vérifie `VITE_SUPABASE_URL` et
-  `VITE_SUPABASE_ANON_KEY` dans Settings → Secrets.
+- **Workflow rouge à l'étape 5 (push to production)** :
+  vérifie que `permissions: contents: write` est bien dans le YAML
+  (déjà fait — ne pas modifier).
 
-## 🧰 Workflow manuel
+- **Workflow rouge à l'étape 6 (notify Hostinger)** :
+  vérifie que `HOSTINGER_DEPLOY_HOOK` est bien dans GitHub Secrets et que
+  l'URL est exacte.
 
-Si tu veux déclencher un déploiement sans pousser de code :
-**GitHub → Actions → Build & Deploy to Hostinger → Run workflow**.
+- **Workflow vert mais site pas à jour** :
+  côté hPanel, dans GitHub Auto Deploy, vérifie qu'il pointe bien sur la
+  branche `production` et le bon `public_html`.
+
+- **Site blanc** :
+  ouvre la console Chrome (F12) → tu vois sûrement
+  `VITE_SUPABASE_URL is undefined`. Ajoute le secret dans GitHub.
+
+- **Login refuse Sacha/Copro2026** :
+  vérifie que la table `crm179_users` contient bien Sacha — d
