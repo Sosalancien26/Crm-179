@@ -330,17 +330,22 @@ export default function ClientDrawer ({ open, onClose, client, paramsByCat, onCr
             </span>
           </div>
           <div className="sm:col-span-2 mt-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Input label="Volume CEE RÉEL (saisi manuellement)" type="number" step="any"
-              value={data.volume_cee_reel ?? ''}
-              onChange={e=> set('volume_cee_reel', e.target.value === '' ? null : Number(e.target.value))}
-              hint="Le volume réellement validé par le mandataire (peut différer du calcul auto)"/>
+            <Input label="Prime CEE RÉELLE (€)" type="number" step="any"
+              value={data.prime_cee_reelle ?? ''}
+              onChange={e=> set('prime_cee_reelle', e.target.value === '' ? null : Number(e.target.value))}
+              hint="Le montant en € que le mandataire va effectivement verser (peut différer de l'estimation du devis)"/>
             <div className="rounded-lg border border-paper-300 bg-paper-100 p-3 flex items-center gap-3">
-              <span className="text-sm text-mute">Écart estimé / réel</span>
+              <span className="text-sm text-mute">Écart estimation / réel</span>
               <span className="ml-auto num text-sm">
-                {data.volume_cee_reel != null
-                  ? <span className={Number(data.volume_cee_reel) >= volume ? 'text-forest-500' : 'text-brick-500'}>
-                      {Number(data.volume_cee_reel) >= volume ? '+' : ''}{fmtNum(Number(data.volume_cee_reel) - volume)} kWh
-                    </span>
+                {data.prime_cee_reelle != null
+                  ? (() => {
+                      const estimee = Number(data.devis?.prime_cee || 0)
+                      const reelle  = Number(data.prime_cee_reelle)
+                      const ecart   = reelle - estimee
+                      return <span className={ecart >= 0 ? 'text-forest-400' : 'text-brick-400'}>
+                        {ecart >= 0 ? '+' : ''}{fmtEUR(ecart)}
+                      </span>
+                    })()
                   : <span className="text-soft">— à saisir —</span>}
               </span>
             </div>
