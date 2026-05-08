@@ -4,11 +4,18 @@ const ThemeCtx = createContext(null)
 const KEY = 'crm179_theme'
 
 export function ThemeProvider ({ children }) {
-  const [theme, setTheme] = useState(() => localStorage.getItem(KEY) || 'dark')
+  // Default = light (mode papier éditorial). Si l'utilisateur a explicitement
+  // choisi 'dark' précédemment, on respecte son choix, sinon light.
+  const [theme, setTheme] = useState(() => {
+    try {
+      const saved = localStorage.getItem(KEY)
+      return saved === 'dark' || saved === 'light' ? saved : 'light'
+    } catch { return 'light' }
+  })
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark')
-    localStorage.setItem(KEY, theme)
+    try { localStorage.setItem(KEY, theme) } catch {}
   }, [theme])
 
   const toggle = useCallback(() => setTheme(t => t === 'dark' ? 'light' : 'dark'), [])
