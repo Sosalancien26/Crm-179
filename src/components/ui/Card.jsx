@@ -12,7 +12,7 @@ export default function Card ({ children, className, hover=false, animate=true, 
     <Comp
       {...motionProps}
       whileHover={hover ? { y: -1 } : undefined}
-      className={cls('card p-5 relative', hover && 'transition-shadow hover:shadow-page', className)}
+      className={cls('card p-6', hover && 'transition-shadow hover:shadow-page', className)}
       {...rest}>
       {children}
     </Comp>

@@ -6,92 +6,96 @@
 html, body, #root { height: 100%; }
 body {
   font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  background: #FBFAF7;
-  color: #1A1814;
+  background: #F5F1EA;
+  color: #1C1B19;
   -webkit-font-smoothing: antialiased;
   font-feature-settings: 'ss01', 'cv11';
 }
-
-/* Halos doux mais discrets */
 body::before {
   content: '';
   position: fixed; inset: 0; pointer-events: none; z-index: 0;
   background:
-    radial-gradient(900px 600px at 5% -10%, rgba(184,101,29,.05), transparent 60%),
-    radial-gradient(900px 600px at 100% 110%, rgba(52,94,114,.04), transparent 60%);
+    radial-gradient(1200px 700px at 0% -5%,  rgba(197,165,114,.06), transparent 50%),
+    radial-gradient(1200px 700px at 100% 105%, rgba(83,91,102,.04), transparent 50%);
 }
 
-html.dark body { background: #0F0E0B; color: #EDEBE7; }
-html.dark body::before { opacity: .6; }
+html.dark body { background: #0E0E0C; color: #ECE8DF; }
+html.dark body::before { opacity: .55; }
 
+/* Scrollbars discrètes Gris Dior */
 *::-webkit-scrollbar { width: 9px; height: 9px; }
 *::-webkit-scrollbar-track { background: transparent; }
 *::-webkit-scrollbar-thumb {
-  background: rgba(60,50,30,.14);
+  background: rgba(28,27,25,.10);
   border-radius: 8px; border: 2px solid transparent; background-clip: padding-box;
 }
-*::-webkit-scrollbar-thumb:hover { background: rgba(60,50,30,.24); border: 2px solid transparent; background-clip: padding-box; }
+*::-webkit-scrollbar-thumb:hover { background: rgba(28,27,25,.20); border: 2px solid transparent; background-clip: padding-box; }
 
-::selection { background: #B8651D; color: #FFFFFF; }
+::selection { background: #C5A572; color: #1C1B19; }
 
 @layer components {
-  .surface     { @apply bg-paper-50 border border-paper-300 shadow-paper; }
-  .surface-flat{ @apply bg-paper-50 border border-paper-300; }
-  .card        { @apply rounded-xl surface; }
+  .surface {
+    @apply bg-paper-50 border border-paper-300/70 shadow-paper;
+  }
+  .surface-flat {
+    @apply bg-paper-50 border border-paper-300/70;
+  }
+  .card { @apply rounded-lg surface; }
 
-  .accent-rule { height: 2px; width: 48px; background: #B8651D; border-radius: 2px; }
+  .accent-rule { height: 1px; width: 56px; background: #C5A572; }
+  .hairline    { height: 1px; width: 100%; background: rgba(28,27,25,.08); }
 
-  .text-deep { color: #1A1814; }
-  .text-mute { color: #605A4E; }
-  .text-soft { color: #8C8579; }
+  .text-deep { color: #1C1B19; }
+  .text-mute { color: #54504A; }
+  .text-soft { color: #857F73; }
 
-  .label    { @apply text-[10px] uppercase font-medium tracking-editorial text-ink-400; }
-  .eyebrow  { @apply text-[11px] uppercase tracking-editorial text-copper-400 font-medium; }
+  .label    { @apply text-[10px] uppercase font-medium tracking-editorial text-ink-300; }
+  .eyebrow  { @apply text-[10px] uppercase tracking-editorial text-copper-400 font-medium; }
 
   .input-base {
-    @apply w-full bg-paper-50 border border-paper-300 rounded-lg px-3.5 py-2.5
-           text-sm text-ink-700 placeholder:text-ink-200
-           transition-all focus:border-copper-400 focus:bg-white focus:shadow-ring focus:outline-none;
+    @apply w-full bg-paper-50 border border-paper-300/80 rounded-md px-3.5 py-2.5
+           text-sm text-ink-600 placeholder:text-ink-200
+           transition-all focus:border-copper-300 focus:bg-white focus:shadow-ring focus:outline-none;
   }
   .focus-ring {
-    @apply outline-none focus-visible:ring-2 focus-visible:ring-copper-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-paper-100;
+    @apply outline-none focus-visible:ring-2 focus-visible:ring-copper-300/50 focus-visible:ring-offset-2 focus-visible:ring-offset-paper-100;
   }
-  .row-hover { @apply transition-colors hover:bg-paper-100; }
+  .row-hover { @apply transition-colors hover:bg-paper-200/60; }
   .num       { @apply font-mono tabular-nums tracking-tight; }
-  .display   { @apply font-display tracking-tight; font-feature-settings: 'ss01', 'cv11', 'liga'; }
-  .divider   { @apply h-px bg-paper-300/70; }
+  .display   { @apply font-display tracking-tight; font-feature-settings: 'ss01', 'liga'; }
+  .divider   { @apply h-px bg-paper-300/60; }
 }
 
-html.dark .surface     { @apply bg-ink-700 border-ink-600; }
-html.dark .surface-flat{ @apply bg-ink-700 border-ink-600; }
-html.dark .input-base  { @apply bg-ink-700 border-ink-600 text-ink-50 placeholder:text-ink-300; }
-html.dark .text-deep   { color: #EDEBE7; }
-html.dark .text-mute   { color: #C7C2B8; }
+html.dark .surface     { @apply bg-ink-700 border-ink-500; }
+html.dark .surface-flat{ @apply bg-ink-700 border-ink-500; }
+html.dark .input-base  { @apply bg-ink-700 border-ink-500 text-ink-50 placeholder:text-ink-300; }
+html.dark .text-deep   { color: #ECE8DF; }
+html.dark .text-mute   { color: #BAB3A6; }
 html.dark .row-hover   { @apply hover:bg-white/[.04]; }
 
-/* Leaflet ton clair propre */
-.leaflet-container { background: #EFEAE0 !important; }
+/* Leaflet en ton couture */
+.leaflet-container { background: #EBE5D8 !important; }
 .leaflet-popup-content-wrapper, .leaflet-popup-tip {
-  background: #FFFFFF; color: #1A1814;
-  border: 1px solid rgba(60,50,30,.10);
-  box-shadow: 0 12px 28px -10px rgba(60,50,30,.18);
+  background: #FFFFFF; color: #1C1B19;
+  border: 1px solid rgba(28,27,25,.10);
+  box-shadow: 0 12px 28px -10px rgba(28,27,25,.12);
   font-family: 'Inter', sans-serif;
 }
 .leaflet-popup-content { margin: 12px 14px; }
-.leaflet-control-attribution { background: rgba(255,255,255,.85) !important; color: #605A4E !important; }
-.leaflet-control-attribution a { color: #B8651D !important; }
-html.dark .leaflet-container { background: #0F0E0B !important; }
+.leaflet-control-attribution { background: rgba(255,255,255,.85) !important; color: #54504A !important; }
+.leaflet-control-attribution a { color: #A78652 !important; }
+html.dark .leaflet-container { background: #0E0E0C !important; }
 html.dark .leaflet-popup-content-wrapper, html.dark .leaflet-popup-tip {
-  background: #1A1814; color: #EDEBE7; border-color: rgba(255,255,255,.08);
+  background: #1C1B19; color: #ECE8DF; border-color: rgba(255,255,255,.08);
 }
 
 .marker-pulse {
-  width: 14px; height: 14px; border-radius: 9999px; background: #B8651D;
-  box-shadow: 0 0 0 0 rgba(184,101,29,.6);
+  width: 14px; height: 14px; border-radius: 9999px; background: #C5A572;
+  box-shadow: 0 0 0 0 rgba(197,165,114,.6);
   animation: pulse 2s infinite;
 }
 @keyframes pulse {
-  0%   { box-shadow: 0 0 0 0 rgba(184,101,29,.6); }
-  70%  { box-shadow: 0 0 0 14px rgba(184,101,29,0); }
-  100% { box-shadow: 0 0 0 0 rgba(184,101,29,0); }
+  0%   { box-shadow: 0 0 0 0 rgba(197,165,114,.6); }
+  70%  { box-shadow: 0 0 0 14px rgba(197,165,114,0); }
+  100% { box-shadow: 0 0 0 0 rgba(197,165,114,0); }
 }

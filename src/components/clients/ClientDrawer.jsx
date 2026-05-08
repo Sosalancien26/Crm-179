@@ -547,9 +547,10 @@ function sectionAnchor (id) {
   if (!s) return null
   return (
     <div id={"section-" + id} className="relative -mt-4 pt-4 scroll-mt-32">
-      <div className="flex items-center gap-2 mb-2">
-        <div className="w-7 h-7 rounded-md bg-gradient-warm grid place-items-center"><s.icon className="w-4 h-4 text-paper-50"/></div>
-        <h3 className="font-display text-xl text-deep">{s.label}</h3>
+      <div className="flex items-baseline gap-3 mb-3">
+        <s.icon className="w-4 h-4 text-copper-400 self-center"/>
+        <h3 className="font-display font-medium text-2xl text-deep tracking-tight">{s.label}</h3>
+        <div className="flex-1 h-px bg-paper-300/60"></div>
       </div>
     </div>
   )
