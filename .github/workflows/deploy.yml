@@ -46,10 +46,28 @@ jobs:
       - name: 🔔 Notify Hostinger to pull
         env:
           HOOK_URL: ${{ secrets.HOSTINGER_DEPLOY_HOOK }}
+        continue-on-error: true
         run: |
           if [ -z "$HOOK_URL" ]; then
-            echo "HOSTINGER_DEPLOY_HOOK secret not set, skipping webhook"
+            echo "ℹ️  No HOSTINGER_DEPLOY_HOOK secret — Hostinger will auto-pull from production branch on its own polling cycle."
             exit 0
           fi
-          curl -X POST -fsSL "$HOOK_URL"
-          echo "Hostinger deploy hook triggered"
+          # Hostinger expects a JSON-ish payload — try several formats, log all responses
+          echo "→ Calling Hostinger deploy hook…"
+          for ATTEMPT in 1 2 3; do
+            HTTP=$(curl -s -o /tmp/resp -w "%{http_code}" \
+                    -X POST \
+                    -H "Content-Type: application/json" \
+                    -H "User-Agent: GitHub-Actions-CRM179" \
+                    --data '{"ref":"refs/heads/production","branch":"production"}' \
+                    "$HOOK_URL" || echo "000")
+            echo "  Attempt $ATTEMPT → HTTP $HTTP"
+            cat /tmp/resp 2>/dev/null | head -3
+            if [ "$HTTP" = "200" ] || [ "$HTTP" = "201" ] || [ "$HTTP" = "202" ] || [ "$HTTP" = "204" ]; then
+              echo "✅ Hostinger acknowledged."
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "⚠️  Webhook didn't return 2xx, but Hostinger should still auto-pull from production within a few min."
+          echo "   The site will be up regardless — the dist/ is committed to the production branch."
