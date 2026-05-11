@@ -28,7 +28,13 @@ export default function DashboardPage () {
     const pipeline = clients
       .filter(c => !['Signé','Perdu','Refusé','Clôturé'].includes(c.statut_devis))
       .reduce((a,b)=> a + Number(b.devis?.montant_ttc||0), 0)
-    const cee = clients.reduce((a,b)=> a + Number(b.volume_cee_estime||0), 0)
+    // Volume CEE en € — basé sur prime_cee_reelle si saisi, sinon prime estimée du devis
+    // Exclut les statuts définitivement perdus
+    const ceeEur = clients
+      .filter(c => !['Refusé','Perdu','Expiré'].includes(c.statut_devis))
+      .reduce((a,b) => a + (b.prime_cee_reelle != null ? Number(b.prime_cee_reelle) : Number(b.devis?.prime_cee || 0)), 0)
+    // On garde aussi le volume kWh pour le sub-label (info technique)
+    const ceeKwh = clients.reduce((a,b)=> a + Number(b.volume_cee_estime||0), 0)
 
     // ─── CA RÉEL — pour chaque devis SIGNÉ uniquement ───
     // = (reste à charge client) + (prime CEE réellement versée par le mandataire)
@@ -63,7 +69,7 @@ export default function DashboardPage () {
     }).reduce((a,b) => a + Number(b.devis?.prime_cee || 0), 0)
 
     return { total, sent: sent.length, sentMonth: sentMonth.length, signed: signed.length, conv,
-             totalSent, totalSigned, pipeline, cee, caReel, primesReelles, reellesSaisies,
+             totalSent, totalSigned, pipeline, ceeEur, ceeKwh, caReel, primesReelles, reellesSaisies,
              acomptesEncaisses, soldesAttendus, primesEnAttentePNCEE }
   }, [clients])
 
@@ -98,7 +104,7 @@ export default function DashboardPage () {
         <KpiCard label="CA RÉEL encaissé"  value={k.caReel}  format="eur" icon={Banknote} accent="copper"
           sub={k.signed > 0 ? `${k.reellesSaisies}/${k.signed} primes réelles saisies` : 'Aucun signé encore'}/>
         <KpiCard label="CA prévisionnel pipeline" value={k.pipeline}  format="eur" icon={Briefcase} accent="glacier"/>
-        <KpiCard label="Volume CEE estimé"       value={k.cee}        format="num" suffix=" kWh" icon={Zap} accent="copper"/>
+        <KpiCard label="Volume CEE (€)"           value={k.ceeEur}     format="eur" icon={Zap} accent="copper" sub={`${(k.ceeKwh/1e6).toFixed(1)} M kWh cumac · primes réelles + estim.`}/>
       </div>
 
       {/* Pipeline financier */}
