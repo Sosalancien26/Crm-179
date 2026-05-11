@@ -33,6 +33,7 @@ const SECTIONS = [
   { id:'technique',      label:'Caractéristiques',   icon: Settings2 },
   { id:'devis',          label:'Devis & financier',  icon: Wallet },
   { id:'statut',         label:'Statut & suivi',     icon: Activity },
+  { id:'dossier_cee',    label:'Dossier CEE',        icon: ClipboardList },
   { id:'timeline',       label:'Timeline',           icon: Activity },
   { id:'documents',      label:'Documents',          icon: FileText },
   { id:'checklist',      label:'Checklist CEE',      icon: ClipboardList },
@@ -70,7 +71,8 @@ export default function ClientDrawer ({ open, onClose, client, paramsByCat, onCr
         adresse_chantier:    client.adresse_chantier    || emptyAdresse(),
         caracteristiques_techniques: client.caracteristiques_techniques || {},
         devis: client.devis || {},
-        checklist_cee: client.checklist_cee || {}
+        checklist_cee: client.checklist_cee || {},
+        dossier_cee: client.dossier_cee || {}
       })
       setContacts((client.crm179_contacts?.length ? client.crm179_contacts : [emptyContact(1)])
         .map((c,i) => ({ ...emptyContact(i+1), ...c })))
@@ -88,7 +90,7 @@ export default function ClientDrawer ({ open, onClose, client, paramsByCat, onCr
         statut_client: 'Prospect froid', statut_devis: 'À envoyer',
         date_ag_prevue:'', date_prochaine_action:'', type_prochaine_action:'',
         score_chaleur: 0, source_lead:'', apporteur_affaires:'', mandataire_cee:'',
-        notes:'', checklist_cee: {}
+        notes:'', checklist_cee: {}, dossier_cee: {}
       })
       setContacts([emptyContact(1)])
     }
@@ -403,6 +405,37 @@ export default function ClientDrawer ({ open, onClose, client, paramsByCat, onCr
           <Select label="Mandataire CEE" value={data.mandataire_cee||''}
             onChange={e=> set('mandataire_cee', e.target.value)}
             options={paramsByCat?.mandataire_cee || []}/>
+        </div>
+
+        {sectionAnchor('dossier_cee')}
+        <div className="card p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <Input  label="N° dossier EBS ENERGIE" value={data.dossier_cee?.numero_dossier_ebs||''}
+            onChange={e=> setIn('dossier_cee.numero_dossier_ebs', e.target.value)} placeholder="138-XXXXXXXXX"/>
+          <Select label="Statut dossier PNCEE" value={data.dossier_cee?.statut||''}
+            onChange={e=> setIn('dossier_cee.statut', e.target.value)}
+            options={['en_attente','depose','valide','refuse','paye']}/>
+          <Input  label="Date convention CEE signée" type="date"
+            value={data.dossier_cee?.date_convention||''}
+            onChange={e=> setIn('dossier_cee.date_convention', e.target.value)}/>
+          <Input  label="Date engagement (début travaux)" type="date"
+            value={data.dossier_cee?.date_engagement||''}
+            onChange={e=> setIn('dossier_cee.date_engagement', e.target.value)}/>
+          <Input  label="Date achèvement (fin travaux)" type="date"
+            value={data.dossier_cee?.date_achevement||''}
+            onChange={e=> setIn('dossier_cee.date_achevement', e.target.value)}/>
+          <Input  label="Date dépôt PNCEE" type="date"
+            value={data.dossier_cee?.date_depot_pncee||''}
+            onChange={e=> setIn('dossier_cee.date_depot_pncee', e.target.value)}/>
+          <Input  label="Date validation PNCEE" type="date"
+            value={data.dossier_cee?.date_validation_pncee||''}
+            onChange={e=> setIn('dossier_cee.date_validation_pncee', e.target.value)}/>
+          <Input  label="Date versement prime CEE" type="date"
+            value={data.dossier_cee?.date_versement_prime||''}
+            onChange={e=> setIn('dossier_cee.date_versement_prime', e.target.value)}/>
+          <Textarea wrapperClass="sm:col-span-2" rows={3} label="Notes dossier CEE"
+            value={data.dossier_cee?.notes_cee||''}
+            onChange={e=> setIn('dossier_cee.notes_cee', e.target.value)}
+            placeholder="N° conventions, échanges avec le mandataire, points bloquants…"/>
         </div>
 
         {sectionAnchor('timeline')}
