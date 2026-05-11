@@ -9,6 +9,7 @@ import Layout from './components/layout/Layout'
 import DashboardPage from './pages/DashboardPage'
 import ClientsPage      from './pages/ClientsPage'
 import ClientDetailPage from './pages/ClientDetailPage'
+import AgendaPage       from './pages/AgendaPage'
 import PipelinePage  from './pages/PipelinePage'
 import MapPage       from './pages/MapPage'
 import ParametresPage from './pages/ParametresPage'
@@ -37,6 +38,7 @@ function Routed () {
           <Route path="/clients"      element={<Page><ClientsPage /></Page>}/>
           <Route path="/clients/:id"  element={<Page><ClientDetailPage /></Page>}/>
           <Route path="/pipeline"     element={<Page><PipelinePage /></Page>}/>
+          <Route path="/agenda"       element={<Page><AgendaPage /></Page>}/>
           <Route path="/carte"      element={<Page><MapPage /></Page>}/>
           <Route path="/parametres" element={<Page><ParametresPage /></Page>}/>
         </Route>

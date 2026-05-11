@@ -1,12 +1,13 @@
 import { NavLink } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { LayoutDashboard, Users, Kanban, MapPinned, Settings, ChevronLeft, ChevronRight } from 'lucide-react'
+import { LayoutDashboard, Users, Kanban, MapPinned, Settings, ChevronLeft, ChevronRight, Calendar } from 'lucide-react'
 import { cls } from '../../lib/utils'
 
 const NAV = [
   { to:'/dashboard',  label:'Dashboard',  icon: LayoutDashboard },
   { to:'/clients',    label:'Clients',    icon: Users },
   { to:'/pipeline',   label:'Pipeline',   icon: Kanban },
+  { to:'/agenda',     label:'Agenda',     icon: Calendar },
   { to:'/carte',      label:'Carte',      icon: MapPinned },
   { to:'/parametres', label:'Paramètres', icon: Settings }
 ]
