@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import {
   Save, Copy as CopyIcon, Trash2, FileDown, MapPin, Phone, Mail,
   Plus, Upload, Sparkles, AlertTriangle, X, FileText, Eye, ListChecks,
-  Activity, Building2, Map as MapIcon, Settings2, Wallet, ClipboardList, Pin, Mail,
+  Activity, Building2, Map as MapIcon, Settings2, Wallet, ClipboardList, Pin,
   ArrowLeft
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
