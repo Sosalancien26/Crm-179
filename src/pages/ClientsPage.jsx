@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Plus, Search, Filter, Download, Sparkles } from 'lucide-react'
+import { Plus, Search, Filter, Download, Sparkles, UploadCloud } from 'lucide-react'
 import Button from '../components/ui/Button'
 import Input from '../components/ui/Input'
 import Select from '../components/ui/Select'
@@ -10,6 +10,7 @@ import Skeleton from '../components/ui/Skeleton'
 import Card from '../components/ui/Card'
 import ClientList from '../components/clients/ClientList'
 import ClientDrawer from '../components/clients/ClientDrawer'
+import PdfDropZone from '../components/clients/PdfDropZone'
 import { useClients } from '../hooks/useClients'
 import { useParametres } from '../hooks/useParametres'
 import { exportCSV } from '../lib/utils'
@@ -27,6 +28,7 @@ export default function ClientsPage () {
     type:'', statut:'', dept:'', energie:'', cdpx3:false
   })
   const [showFilters, setShowFilters] = useState(false)
+  const [showDrop, setShowDrop] = useState(false)
   const [limit, setLimit] = useState(40)
 
   // Index params/colors pour la liste
@@ -132,11 +134,17 @@ export default function ClientsPage () {
           <p className="text-sm text-ink-300 mt-1">{filtered.length} résultats {q && `pour « ${q} »`}</p>
         </div>
         <div className="flex items-center gap-2">
+          <Button variant="ghost" icon={UploadCloud} onClick={() => setShowDrop(v=>!v)}>{showDrop ? "Masquer" : "Importer PDF"}</Button>
           <Button variant="ghost" icon={Download} onClick={handleExport}>Exporter CSV</Button>
           <Button icon={Plus} onClick={()=>{ setEditing(null); setDrawerOpen(true) }}>Nouveau client</Button>
         </div>
       </div>
 
+      {showDrop && (
+        <div className="mb-4">
+          <PdfDropZone onDone={() => { /* la liste se recharge automatiquement via useClients */ }}/>
+        </div>
+      )}
       {/* Search & Filters */}
       <Card className="!p-3 mb-4">
         <div className="flex flex-wrap items-center gap-2">
