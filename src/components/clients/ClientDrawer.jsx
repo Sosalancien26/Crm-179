@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import {
   Save, Copy as CopyIcon, Trash2, FileDown, MapPin, Phone, Mail,
   Plus, Upload, Sparkles, AlertTriangle, X, FileText, Eye, ListChecks,
-  Activity, Building2, Map as MapIcon, Settings2, Wallet, ClipboardList, Pin,
+  Activity, Building2, Map as MapIcon, Settings2, Wallet, ClipboardList, Pin, Mail,
   ArrowLeft
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
@@ -19,6 +19,9 @@ import MiniMapChantier from './MiniMapChantier'
 import { useClients } from '../../hooks/useClients'
 import { useDocuments } from '../../hooks/useDocuments'
 import { useTimeline } from '../../hooks/useTimeline'
+import { useActivites } from '../../hooks/useActivites'
+import { TEMPLATES } from '../../lib/templates'
+import { useAuth } from '../../contexts/AuthContext'
 import { useToast } from '../../contexts/ToastContext'
 import { deptFromCP, geocodeAdresse, zoneClimatique } from '../../lib/geocoding'
 import { CHECKLIST_ITEMS, calcVolumeCEE, isCoupDePouceX3, checklistProgress, estimerPrimeCEE } from '../../lib/cee'
@@ -34,6 +37,7 @@ const SECTIONS = [
   { id:'devis',          label:'Devis & financier',  icon: Wallet },
   { id:'statut',         label:'Statut & suivi',     icon: Activity },
   { id:'dossier_cee',    label:'Dossier CEE',        icon: ClipboardList },
+  { id:'activites',      label:"Journal d'activité",icon: Activity },
   { id:'timeline',       label:'Timeline',           icon: Activity },
   { id:'documents',      label:'Documents',          icon: FileText },
   { id:'checklist',      label:'Checklist CEE',      icon: ClipboardList },
@@ -52,6 +56,8 @@ export default function ClientDrawer ({ open, onClose, client, paramsByCat, onCr
   const { create, update, remove, duplicate, upsertContacts } = useClients()
   const { events: timeline } = useTimeline(client?.id)
   const { docs, upload, remove: removeDoc, signedUrl } = useDocuments(client?.id)
+  const { items: activites, add: addActivite, remove: removeActivite } = useActivites(client?.id)
+  const { session } = useAuth()
   const toast = useToast()
   const nav   = useNavigate()
   const isNew = !client?.id
@@ -204,6 +210,16 @@ export default function ClientDrawer ({ open, onClose, client, paramsByCat, onCr
             onClick={()=> exportClientPDF({ ...data, client_id: client.client_id }, contacts)}>
             Exporter PDF
           </Button>
+          <Button variant="ghost" icon={Mail} size="sm" onClick={()=>{
+            const tplKey = window.prompt('Modèle :\n1 = Convocation AG\n2 = Relance devis\n3 = Rappel signature\nTaper 1, 2 ou 3 :')
+            const map = { '1':'convocation_ag', '2':'relance_devis', '3':'rappel_signature' }
+            const key = map[tplKey]
+            if (!key) return
+            const tpl = TEMPLATES[key]
+            const { subject, body } = tpl.build({ ...data, client_id: client.client_id, crm179_contacts: contacts })
+            const mail = contacts?.[0]?.email || ''
+            window.location.href = `mailto:${mail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+          }}>Modèle email</Button>
           <Button variant="ghost" icon={MapPin} size="sm" onClick={()=> {
             const a = data?.adresse_identique ? data?.adresse_facturation : data?.adresse_chantier
             const q = encodeURIComponent([a?.rue, a?.cp, a?.ville].filter(Boolean).join(' '))
@@ -438,6 +454,14 @@ export default function ClientDrawer ({ open, onClose, client, paramsByCat, onCr
             placeholder="N° conventions, échanges avec le mandataire, points bloquants…"/>
         </div>
 
+        {sectionAnchor('activites')}
+        <ActivitesSection
+          items={activites}
+          onAdd={addActivite}
+          onRemove={removeActivite}
+          authorName={session?.prenom}
+          disabled={isNew}/>
+
         {sectionAnchor('timeline')}
         <div className="card p-4">
           {!isNew && timeline.length > 0 ? (
@@ -652,5 +676,63 @@ function AddressBlock ({ value, onChange, embedded=false }) {
         <Input wrapperClass="sm:col-span-2" label="Pays"    value={v.pays||'France'} onChange={e=> set('pays', e.target.value)}/>
       </div>
     </Wrap>
+  )
+}
+
+
+function ActivitesSection ({ items=[], onAdd, onRemove, authorName, disabled }) {
+  const [type, setType]     = useState('appel')
+  const [titre, setTitre]   = useState('')
+  const [contenu, setContenu] = useState('')
+  const submit = async (e) => {
+    e.preventDefault()
+    if (!titre && !contenu) return
+    await onAdd({ type_activite: type, titre, contenu, auteur: authorName || 'Anonyme' })
+    setTitre(''); setContenu('')
+  }
+  const TYPES = [
+    { v:'appel',  label:'Appel',  color:'#535B66' },
+    { v:'email',  label:'Email',  color:'#345E72' },
+    { v:'rdv',    label:'RDV',    color:'#3F4F40' },
+    { v:'visite', label:'Visite', color:'#C5A572' },
+    { v:'autre',  label:'Autre',  color:'#857F73' }
+  ]
+  return (
+    <div className="card p-4 flex flex-col gap-3">
+      {disabled
+        ? <div className="text-sm text-soft">Sauvegarder le client d'abord pour ajouter des activités.</div>
+        : <form onSubmit={submit} className="grid grid-cols-1 sm:grid-cols-[140px_1fr_auto] gap-2 items-start">
+            <Select value={type} onChange={e=>setType(e.target.value)} options={TYPES.map(t=>({valeur:t.v,label:t.label}))} allowEmpty={false}/>
+            <div className="flex flex-col gap-2">
+              <Input placeholder="Titre (ex: Appel pour relance devis)" value={titre} onChange={e=>setTitre(e.target.value)}/>
+              <Textarea rows={2} placeholder="Détails (optionnel)" value={contenu} onChange={e=>setContenu(e.target.value)}/>
+            </div>
+            <Button type="submit" icon={Plus} size="sm">Ajouter</Button>
+          </form>
+      }
+      <div className="flex flex-col gap-2">
+        {items.length === 0 && <div className="text-sm text-soft italic">Aucune activité enregistrée.</div>}
+        {items.map(a => {
+          const t = TYPES.find(x => x.v === a.type_activite) || TYPES[4]
+          return (
+            <div key={a.id} className="rounded-md border border-paper-300/60 bg-paper-50 p-3 flex gap-3">
+              <span className="w-1 self-stretch rounded" style={{ background: t.color }}/>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <Badge color={t.color} size="xs">{t.label}</Badge>
+                  <span className="text-xs text-soft">{fmtRelative(a.created_at)}</span>
+                  <span className="text-xs text-soft">· par {a.auteur || '—'}</span>
+                </div>
+                {a.titre && <div className="text-sm font-medium text-deep mt-1">{a.titre}</div>}
+                {a.contenu && <div className="text-sm text-mute whitespace-pre-wrap mt-0.5">{a.contenu}</div>}
+              </div>
+              <button onClick={()=> onRemove(a.id)} className="text-soft hover:text-brick-400 self-start">
+                <X className="w-4 h-4"/>
+              </button>
+            </div>
+          )
+        })}
+      </div>
+    </div>
   )
 }

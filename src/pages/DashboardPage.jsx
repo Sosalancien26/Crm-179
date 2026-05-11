@@ -1,5 +1,7 @@
 import { useMemo } from 'react'
-import { Users, FileText, BadgeCheck, TrendingUp, Banknote, Coins, Zap, Briefcase } from 'lucide-react'
+import { Users, FileText, BadgeCheck, TrendingUp, Banknote, Coins, Zap, Briefcase, FileSpreadsheet } from 'lucide-react'
+import Button from '../components/ui/Button'
+import { exportClientsExcel } from '../lib/excel-export'
 import KpiCard from '../components/dashboard/KpiCard'
 import { DonutTypes, BarStatuts, LineSignatures, TopClients } from '../components/dashboard/Charts'
 import MiniMapDensity from '../components/dashboard/MiniMapDensity'
@@ -47,8 +49,22 @@ export default function DashboardPage () {
     // Combien de signés avec une prime réelle saisie (pour afficher le degré de confiance)
     const reellesSaisies = signed.filter(c => c.prime_cee_reelle != null).length
 
+    // ── Pipeline financier ──
+    const acomptesEncaisses = signed.reduce((a,b) => a + Number(b.devis?.acompte || 0), 0)
+    const soldesAttendus    = signed.reduce((a,b) => {
+      const ttc     = Number(b.devis?.montant_ttc || 0)
+      const acompte = Number(b.devis?.acompte || 0)
+      const prime   = Number(b.devis?.prime_cee || 0)
+      return a + Math.max(0, ttc - prime - acompte)
+    }, 0)
+    const primesEnAttentePNCEE = signed.filter(c => {
+      const st = c.dossier_cee?.statut
+      return !st || ['en_attente','depose','valide'].includes(st)
+    }).reduce((a,b) => a + Number(b.devis?.prime_cee || 0), 0)
+
     return { total, sent: sent.length, sentMonth: sentMonth.length, signed: signed.length, conv,
-             totalSent, totalSigned, pipeline, cee, caReel, primesReelles, reellesSaisies }
+             totalSent, totalSigned, pipeline, cee, caReel, primesReelles, reellesSaisies,
+             acomptesEncaisses, soldesAttendus, primesEnAttentePNCEE }
   }, [clients])
 
   return (
@@ -60,6 +76,8 @@ export default function DashboardPage () {
           <h1 className="font-display text-4xl md:text-5xl text-deep tracking-tight">Dashboard</h1>
           <p className="text-sm text-ink-300 mt-1">Pilotage de l'opération CEE BAR-TH-179 — PAC collective air/eau.</p>
         </div>
+        <div className="flex items-center gap-2">
+        <Button variant="ghost" icon={FileSpreadsheet} size="sm" onClick={()=> exportClientsExcel(clients)}>Export Excel</Button>
         <Card className="!p-0 flex items-center gap-4 px-4 py-2.5">
           <ProgressCircle value={k.conv} size={56} stroke={6} sub="Conv." />
           <div className="text-xs text-ink-300">
@@ -67,6 +85,7 @@ export default function DashboardPage () {
             <div>Devis signés</div>
           </div>
         </Card>
+        </div>
       </div>
 
       {/* KPIs */}
@@ -80,6 +99,17 @@ export default function DashboardPage () {
           sub={k.signed > 0 ? `${k.reellesSaisies}/${k.signed} primes réelles saisies` : 'Aucun signé encore'}/>
         <KpiCard label="CA prévisionnel pipeline" value={k.pipeline}  format="eur" icon={Briefcase} accent="glacier"/>
         <KpiCard label="Volume CEE estimé"       value={k.cee}        format="num" suffix=" kWh" icon={Zap} accent="copper"/>
+      </div>
+
+      {/* Pipeline financier */}
+      <div className="mb-6">
+        <div className="eyebrow mb-3">Pipeline financier</div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <KpiCard label="Acomptes encaissés"          value={k.acomptesEncaisses} format="eur" icon={Coins}     accent="forest"/>
+          <KpiCard label="Soldes attendus clients"     value={k.soldesAttendus}    format="eur" icon={Banknote}  accent="copper"/>
+          <KpiCard label="Primes CEE en attente PNCEE" value={k.primesEnAttentePNCEE} format="eur" icon={Briefcase} accent="glacier"
+            sub="À recevoir du mandataire"/>
+        </div>
       </div>
 
       {/* Charts */}
